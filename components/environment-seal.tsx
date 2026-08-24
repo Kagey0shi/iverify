@@ -1,38 +1,43 @@
 "use client"
 
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { useEnvironment } from "@/lib/environment"
+import { cn } from "@/lib/utils"
 
 export function EnvironmentSeal() {
   const { environment, setEnvironment } = useEnvironment()
+  const isSandbox = environment === "sandbox"
 
   return (
-    <div className="flex items-center gap-3">
-      <div
-        data-environment={environment}
-        className="env-seal inline-flex items-center gap-2 rounded-md px-2.5 py-1.5 text-primary-foreground"
-        aria-label={`Current environment: ${environment}`}
+    <div
+      className="flex h-10 items-center border-1 rounded-full bg-muted p-1"
+      aria-label={`Current environment: ${environment}`}
+    >
+      <button
+        type="button"
+        aria-pressed={!isSandbox}
+        onClick={() => setEnvironment("live")}
+        className={cn(
+          "rounded-full px-3 py-1.5 text-xs font-semibold tracking-wide uppercase transition-colors",
+          !isSandbox
+            ? "bg-success text-white shadow-sm"
+            : "text-muted-foreground hover:text-foreground"
+        )}
       >
-        <span aria-hidden className="env-seal-pip size-1.5 rounded-full" />
-        <span className="font-mono text-[11px] font-medium tracking-[0.2em] uppercase">
-          {environment === "live" ? "Live" : "Sandbox"}
-        </span>
-      </div>
-      <ToggleGroup
-        value={[environment]}
-        onValueChange={(value) => {
-          if (value[0] === "live" || value[0] === "sandbox") {
-            setEnvironment(value[0])
-          }
-        }}
-        variant="outline"
-        size="sm"
-        spacing={0}
-        aria-label="Switch environment"
+        Live
+      </button>
+      <button
+        type="button"
+        aria-pressed={isSandbox}
+        onClick={() => setEnvironment("sandbox")}
+        className={cn(
+          "rounded-full px-3 py-1.5 text-xs font-semibold tracking-wide uppercase transition-colors",
+          isSandbox
+            ? "bg-warning text-white shadow-sm"
+            : "text-muted-foreground hover:text-foreground"
+        )}
       >
-        <ToggleGroupItem value="live">Live</ToggleGroupItem>
-        <ToggleGroupItem value="sandbox">Sandbox</ToggleGroupItem>
-      </ToggleGroup>
+        Sandbox
+      </button>
     </div>
   )
 }

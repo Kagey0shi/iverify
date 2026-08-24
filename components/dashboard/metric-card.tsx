@@ -32,7 +32,7 @@ export function MetricCard({
       )}
     >
       <div className="flex flex-1 items-start gap-3 px-5 py-5">
-        <span className="flex size-9 shrink-0 items-center justify-center rounded-lg border bg-card text-foreground [&_svg]:size-4">
+        <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground [&_svg]:size-4">
           <Icon />
         </span>
         <div className="flex min-w-0 flex-col gap-0.5">
@@ -46,8 +46,10 @@ export function MetricCard({
         {typeof delta === "number" ? (
           <span
             className={cn(
-              "inline-flex items-center gap-0.5 font-medium tabular-nums",
-              deltaIsGood ? "text-success" : "text-destructive"
+              "inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 font-medium tabular-nums",
+              deltaIsGood
+                ? "bg-success/12 text-success"
+                : "bg-destructive/10 text-destructive"
             )}
           >
             <Arrow className="size-3" strokeWidth={2.5} />

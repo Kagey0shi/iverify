@@ -22,7 +22,7 @@ const badgeVariants = cva(
         success:
           "bg-success/12 text-success [a]:hover:bg-success/20",
         warning:
-          "bg-warning text-warning-foreground [a]:hover:bg-warning/80",
+          "bg-warning/12 text-warning-foreground [a]:hover:bg-warning/20",
       },
     },
     defaultVariants: {

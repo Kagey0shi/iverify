@@ -15,39 +15,10 @@ const EnvironmentContext = React.createContext<EnvironmentContextValue | null>(
   null
 )
 
-let current: Environment = "live"
-const listeners = new Set<() => void>()
-
 function readStored(): Environment {
-  if (typeof window === "undefined") return "live"
   const stored = window.localStorage.getItem(STORAGE_KEY)
   if (stored === "live" || stored === "sandbox") return stored
   return "live"
-}
-
-function subscribe(onStoreChange: () => void) {
-  listeners.add(onStoreChange)
-  return () => listeners.delete(onStoreChange)
-}
-
-function getSnapshot() {
-  return current
-}
-
-function getServerSnapshot(): Environment {
-  return "live"
-}
-
-function emit(next: Environment) {
-  current = next
-  if (typeof window !== "undefined") {
-    window.localStorage.setItem(STORAGE_KEY, next)
-  }
-  listeners.forEach((listener) => listener())
-}
-
-if (typeof window !== "undefined") {
-  current = readStored()
 }
 
 export function EnvironmentProvider({
@@ -55,14 +26,26 @@ export function EnvironmentProvider({
 }: {
   children: React.ReactNode
 }) {
-  const environment = React.useSyncExternalStore(
-    subscribe,
-    getSnapshot,
-    getServerSnapshot
-  )
+  const [environment, setEnvironmentState] =
+    React.useState<Environment>("live")
+
+  React.useEffect(() => {
+    setEnvironmentState(readStored())
+
+    function onStorage(event: StorageEvent) {
+      if (event.key !== STORAGE_KEY) return
+      if (event.newValue === "live" || event.newValue === "sandbox") {
+        setEnvironmentState(event.newValue)
+      }
+    }
+
+    window.addEventListener("storage", onStorage)
+    return () => window.removeEventListener("storage", onStorage)
+  }, [])
 
   const setEnvironment = React.useCallback((next: Environment) => {
-    emit(next)
+    setEnvironmentState(next)
+    window.localStorage.setItem(STORAGE_KEY, next)
   }, [])
 
   const value = React.useMemo(

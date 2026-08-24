@@ -52,7 +52,7 @@ function VolumeTooltip({
   const point = payload[0].payload
 
   return (
-    <div className="rounded-lg border border-border/50 bg-background px-3 py-2 shadow-lg">
+    <div className="rounded-lg border border-border/80 bg-card px-3 py-2 shadow-lg">
       <p className="font-heading text-base font-semibold tabular-nums">
         {formatCount(point.calls)}
       </p>
@@ -114,7 +114,7 @@ export function VolumeChart() {
                 <stop
                   offset="0%"
                   stopColor="var(--color-calls)"
-                  stopOpacity={0.2}
+                  stopOpacity={0.18}
                 />
                 <stop
                   offset="100%"

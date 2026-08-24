@@ -22,12 +22,12 @@ import { cn } from "@/lib/utils"
 
 const METHOD_COLORS: Record<MethodId, string> = {
   "ghana-card-basic": "var(--chart-1)",
-  "ghana-card-linked": "color-mix(in oklch, var(--chart-1) 58%, white)",
-  "ghana-card-biometrics": "var(--chart-5)",
+  "ghana-card-linked": "var(--chart-5)",
+  "ghana-card-biometrics": "var(--chart-4)",
   "bank-account": "var(--chart-2)",
   "voter-id": "var(--chart-3)",
   passport: "var(--warning)",
-  "phone-number": "color-mix(in oklch, var(--chart-1) 50%, var(--chart-3))",
+  "phone-number": "#94a3b8",
 }
 
 const chartConfig = {
@@ -110,8 +110,10 @@ export function MethodMix() {
             <p className="flex items-center gap-1 text-xs">
               <span
                 className={cn(
-                  "inline-flex items-center gap-0.5 font-medium tabular-nums",
-                  isUp ? "text-success" : "text-destructive"
+                  "inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 font-medium tabular-nums",
+                  isUp
+                    ? "bg-success/12 text-success"
+                    : "bg-destructive/10 text-destructive"
                 )}
               >
                 <Arrow className="size-3" strokeWidth={2.5} />

@@ -204,7 +204,7 @@ export function VerifyWorkspace() {
                   <ToggleGroupItem
                     key={method.id}
                     value={method.id}
-                    className="h-auto w-full flex-col items-start gap-2 whitespace-normal py-3 text-left"
+                    className="h-auto w-full flex-col items-start gap-2 whitespace-normal border-border bg-card py-3 text-left data-pressed:border-primary/30 data-pressed:bg-primary/8"
                   >
                     <span className="flex w-full items-start justify-between gap-3">
                       <span className="flex items-center gap-2 font-medium">
