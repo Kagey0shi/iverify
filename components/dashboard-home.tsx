@@ -1,38 +1,43 @@
+import { Suspense } from "react"
 import Link from "next/link"
 import {
-  ArrowUpRightIcon,
   BanknoteIcon,
   PhoneCallIcon,
+  PlusIcon,
   RefreshCwIcon,
-  ShieldCheckIcon,
+  ShieldAlertIcon,
   ShieldXIcon,
   TargetIcon,
 } from "lucide-react"
 
 import { ActivityPanel } from "@/components/dashboard/activity-panel"
 import { MethodMix } from "@/components/dashboard/method-mix"
-import { MethodStatus } from "@/components/dashboard/method-status"
+import {
+  MethodStatus,
+  MethodStatusFallback,
+} from "@/components/dashboard/method-status"
 import { MetricCard } from "@/components/dashboard/metric-card"
 import { VolumeChart } from "@/components/dashboard/volume-chart"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { ApiStatusBadge } from "@/components/status-badge"
+import { LiveStatusBadge } from "@/components/status-badge"
 import { formatCount, formatGhs, formatTimestamp } from "@/lib/format"
-import { apiStatusCopy, DASHBOARD, RECENT_ACTIVITY } from "@/lib/mock/dashboard"
-import type { ActivityItem, ApiStatus } from "@/lib/types"
+import {
+  getLiveStatus,
+  liveStatusDetail,
+} from "@/lib/live-status"
+import { DASHBOARD, RECENT_ACTIVITY } from "@/lib/mock/dashboard"
+import type { ActivityItem } from "@/lib/types"
 
 export function DashboardHome({
-  apiStatus,
   emptyActivity,
 }: {
-  apiStatus: ApiStatus
   emptyActivity: boolean
 }) {
   const successRate =
     (DASHBOARD.successfulMatches / DASHBOARD.callsThisMonth) * 100
   const failedCalls = DASHBOARD.callsThisMonth - DASHBOARD.successfulMatches
-  const copy = apiStatusCopy(apiStatus)
   const activity: ActivityItem[] = emptyActivity ? [] : RECENT_ACTIVITY
 
   return (
@@ -48,23 +53,14 @@ export function DashboardHome({
           </p>
         </div>
         <Button nativeButton={false} render={<Link href="/verify" />}>
+          <PlusIcon data-icon="inline-start" />
           Verify Now
-          <ArrowUpRightIcon data-icon="inline-end" />
         </Button>
       </div>
 
-      {apiStatus !== "live" ? (
-        <Alert variant={apiStatus === "outage" ? "destructive" : "default"}>
-          <ShieldCheckIcon />
-          <AlertTitle className="flex items-center gap-2">
-            API status
-            <ApiStatusBadge status={apiStatus} />
-          </AlertTitle>
-          <AlertDescription>
-            {copy.alertTitle}. {copy.alertDescription}
-          </AlertDescription>
-        </Alert>
-      ) : null}
+      <Suspense fallback={null}>
+        <LiveStatusAlert />
+      </Suspense>
 
       <section>
         <h2 className="sr-only">This month</h2>
@@ -106,8 +102,26 @@ export function DashboardHome({
 
       <section className="grid gap-4 xl:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
         <ActivityPanel activity={activity} />
-        <MethodStatus apiStatus={apiStatus} />
+        <Suspense fallback={<MethodStatusFallback />}>
+          <MethodStatus />
+        </Suspense>
       </section>
     </div>
+  )
+}
+
+async function LiveStatusAlert() {
+  const live = await getLiveStatus()
+  if (!live || live.overallStatus === "operational") return null
+
+  return (
+    <Alert variant={live.overallStatus === "down" ? "destructive" : "default"}>
+      <ShieldAlertIcon />
+      <AlertTitle className="flex items-center gap-2">
+        API status
+        <LiveStatusBadge status={live.overallStatus} />
+      </AlertTitle>
+      <AlertDescription>{`${liveStatusDetail(live)}.`}</AlertDescription>
+    </Alert>
   )
 }

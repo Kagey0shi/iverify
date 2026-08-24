@@ -28,17 +28,21 @@ import {
 } from "@/components/ui/table"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { OutcomeBadge } from "@/components/status-badge"
-import { formatGhs, formatRelative, methodName } from "@/lib/format"
+import { formatRelative, methodName } from "@/lib/format"
 import type { ActivityItem } from "@/lib/types"
 
 export function ActivityPanel({ activity }: { activity: ActivityItem[] }) {
   const failed = activity.filter((item) => item.outcome !== "match")
 
   return (
-    <Card>
+    <Card className="h-full">
       <CardHeader>
         <CardTitle>Recent activity</CardTitle>
-        <CardDescription>Last 5 verification calls</CardDescription>
+        <CardDescription>
+          {activity.length === 0
+            ? "Latest verification calls"
+            : `Last ${activity.length} verification calls`}
+        </CardDescription>
         <CardAction>
           <Button
             nativeButton={false}
@@ -90,22 +94,20 @@ function ActivityTable({ items }: { items: ActivityItem[] }) {
           <TableHead>Method</TableHead>
           <TableHead>ID submitted</TableHead>
           <TableHead>Outcome</TableHead>
-          <TableHead className="text-right">Cost</TableHead>
           <TableHead className="text-right">Time</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {items.map((item) => (
           <TableRow key={item.id}>
-            <TableCell className="font-medium">{methodName(item.methodId)}</TableCell>
+            <TableCell className="whitespace-normal font-medium">
+              {methodName(item.methodId)}
+            </TableCell>
             <TableCell className="font-mono text-muted-foreground tabular-nums">
               {item.idSubmitted}
             </TableCell>
             <TableCell>
               <OutcomeBadge outcome={item.outcome} />
-            </TableCell>
-            <TableCell className="text-right font-mono tabular-nums">
-              {formatGhs(item.costGhs)}
             </TableCell>
             <TableCell className="text-right text-muted-foreground">
               {formatRelative(item.timestamp)}

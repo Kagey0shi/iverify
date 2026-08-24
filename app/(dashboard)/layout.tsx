@@ -1,6 +1,11 @@
 import type { CSSProperties, ReactNode } from "react"
+import { Suspense } from "react"
 
 import { AppSidebar } from "@/components/app-sidebar"
+import {
+  SidebarApiStatus,
+  SidebarApiStatusFallback,
+} from "@/components/sidebar-api-status"
 import { SiteHeader } from "@/components/site-header"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { Toaster } from "@/components/ui/sonner"
@@ -23,10 +28,16 @@ export default function DashboardLayout({
             } as CSSProperties
           }
         >
-          <AppSidebar />
-          <SidebarInset>
+          <AppSidebar
+            apiStatus={
+              <Suspense fallback={<SidebarApiStatusFallback />}>
+                <SidebarApiStatus />
+              </Suspense>
+            }
+          />
+          <SidebarInset className="h-svh overflow-hidden">
             <SiteHeader />
-            <div className="flex min-h-0 flex-1 flex-col">{children}</div>
+            <div className="min-h-0 flex-1 overflow-y-auto">{children}</div>
           </SidebarInset>
         </SidebarProvider>
       </TooltipProvider>

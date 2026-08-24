@@ -1,6 +1,6 @@
 "use client"
 
-import { Suspense } from "react"
+import type { ReactNode } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import {
@@ -12,7 +12,6 @@ import {
   SettingsIcon,
 } from "lucide-react"
 
-import { SidebarApiStatus } from "@/components/sidebar-api-status"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import {
   Sidebar,
@@ -36,7 +35,7 @@ const NAV = [
   { title: "API Docs", href: "/docs", icon: BookOpenIcon },
 ] as const
 
-export function AppSidebar() {
+export function AppSidebar({ apiStatus }: { apiStatus: ReactNode }) {
   const pathname = usePathname()
 
   return (
@@ -63,37 +62,48 @@ export function AppSidebar() {
         </SidebarMenu>
         <SidebarTrigger
           title="Toggle sidebar"
-          className="hidden size-8 shrink-0 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground md:flex"
+          className="hidden size-8 shrink-0 text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground md:flex"
         />
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent>
-            <SidebarMenu>
-              {NAV.map((item) => (
-                <SidebarMenuItem key={item.href}>
-                  <SidebarMenuButton
-                    isActive={
-                      item.href === "/"
-                        ? pathname === "/"
-                        : pathname.startsWith(item.href)
-                    }
-                    tooltip={item.title}
-                    render={<Link href={item.href} />}
+            <SidebarMenu className="gap-3">
+              {NAV.map((item) => {
+                const isActive =
+                  item.href === "/"
+                    ? pathname === "/"
+                    : pathname.startsWith(item.href)
+
+                return (
+                  <SidebarMenuItem
+                    key={item.href}
+                    className="-mr-2 group-data-[collapsible=icon]:mr-0"
                   >
-                    <item.icon />
-                    <span>{item.title}</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+                    <SidebarMenuButton
+                      isActive={isActive}
+                      tooltip={item.title}
+                      render={<Link href={item.href} />}
+                      className="rounded-l-lg rounded-r-none text-muted-foreground hover:bg-primary/5 hover:text-foreground active:bg-primary/10 data-active:bg-primary/10 data-active:font-medium data-active:text-primary data-active:hover:bg-primary/10 data-active:hover:text-primary"
+                    >
+                      <item.icon />
+                      <span>{item.title}</span>
+                    </SidebarMenuButton>
+                    {isActive ? (
+                      <span
+                        aria-hidden
+                        className="pointer-events-none absolute inset-y-0 right-0 w-1 rounded-l-full bg-primary group-data-[collapsible=icon]:hidden"
+                      />
+                    ) : null}
+                  </SidebarMenuItem>
+                )
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
-        <Suspense>
-          <SidebarApiStatus />
-        </Suspense>
+        {apiStatus}
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" tooltip="Acme Payments">
